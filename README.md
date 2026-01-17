@@ -275,21 +275,3 @@ terraform destroy
 5. **IAM**: IRSA (IAM Roles for Service Accounts) for secure access
 6. **Cost Optimization**: Karpenter with spot instances for cost efficiency
 
-## Additional Resources
-
-- [EKS Documentation](https://docs.aws.amazon.com/eks/)
-- [Karpenter Documentation](https://karpenter.sh/)
-- [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
-- [Karpenter Best Practices](https://karpenter.sh/docs/concepts/)
-
-## Support
-
-For issues or questions:
-1. Check the troubleshooting section
-2. Review Terraform and AWS CloudFormation events
-3. Verify AWS IAM permissions
-4. Check Karpenter logs in the cluster
-
-## License
-
-This infrastructure code is provided as-is for educational and production use.
