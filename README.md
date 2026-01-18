@@ -31,10 +31,11 @@ This approach ensures:
 * Reduced infrastructure costs using on-demand and spot instances
 
 
-This repository contains Terraform code to provision an **Amazon EKS cluster with Karpenter** for dynamic node provisioning.
-The infrastructure supports **multiple environments (dev, pre-prod, prod)** using **directory-based separation**, following Terraform and AWS best practices.
+
 
 ---
+This repository contains Terraform code to provision an **Amazon EKS cluster with Karpenter** for dynamic node provisioning.
+The infrastructure supports **multiple environments (dev, pre-prod, prod)** using **directory-based separation**, following Terraform and AWS best practices.
 
 ## Architecture
 
