@@ -106,24 +106,7 @@ The following resources **must already exist** in your AWS account:
 ## Project Structure
 
 ```text
-terraform-eks-ready-submit/
-│
-├── README.md
-├── .gitignore
-│
-├── dev/
-│   ├── backend.tf          # Remote state configuration
-│   ├── providers.tf        # AWS, Kubernetes, Helm providers
-│   ├── main.tf             # EKS + Karpenter resources
-│   ├── data.tf             # Existing VPC, subnets, security group lookup
-│   ├── variable.tf         # Input variables
-│   └── terraform.tfvars    # Environment-specific values
-│
-├── pre-prod/
-│   └── (same structure as dev)
-│
-└── prod/
-    └── (same structure as dev)
+. ├── environment │ ├── dev │ │ ├── main.tf │ │ ├── variables.tf │ │ └── terraform.tfvars │ ├── pre-prod │ │ ├── main.tf │ │ ├── variables.tf │ │ └── terraform.tfvars │ └── prod │ ├── main.tf │ ├── variables.tf │ └── terraform.tfvars │ ├── module │ ├── eks │ │ ├── main.tf │ │ ├── variables.tf │ │ └── outputs.tf │ └── karpenter │ ├── main.tf │ ├── variables.tf │ └── outputs.tf │ ├── statebucket │ └── main.tf │ └── README.md
 ```
 
 Each environment is **fully self-contained** and can be deployed independently.
