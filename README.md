@@ -172,9 +172,8 @@ Terraform will:
 ### 2. Configure kubectl Access
 
 ```bash
-aws eks update-kubeconfig \
-  --name eks-cluster-dev \
-  --region ap-south-1
+aws eks update-kubeconfig --region <your-region> --name <your-cluster-name>
+kubectl cluster-info
 ```
 
 Verify:
@@ -182,6 +181,10 @@ Verify:
 ```bash
 kubectl get nodes
 kubectl get pods -n karpenter
+
+# Check Karpenter CRDs
+kubectl get nodepool
+kubectl get ec2nodeclass
 ```
 
 ---
@@ -201,7 +204,54 @@ cd ../prod
 terraform init
 terraform apply
 ```
+#### 6: Verify aws-auth ConfigMap
+```bash
+kubectl get configmap aws-auth -n kube-system -o yaml
+```
 
+**Should contain TWO roles:**
+```yaml
+mapRoles: |
+  - rolearn: arn:aws:iam::xxx:role/eks-node-group-xxx  # Managed nodes
+    username: system:node:{{EC2PrivateDNSName}}
+    groups: [system:bootstrappers, system:nodes]
+  
+  - rolearn: arn:aws:iam::xxx:role/Karpenter-xxx       # Karpenter nodes
+    username: system:node:{{EC2PrivateDNSName}}
+    groups: [system:bootstrappers, system:nodes]
+```
+
+---
+
+## 🧪 Testing Autoscaling
+
+### Test 1: Scale Up (Trigger Node Provisioning)
+
+#### Deploy Test Workload
+```bash
+kubectl apply -f test_scaling.yaml
+
+# Initial state
+kubectl get pods
+```
+
+#### Trigger Scale-Up
+```bash
+kubectl scale deployment inflate --replicas=10
+
+# Watch pods
+kubectl get pods -w
+```
+
+**Expected behavior:**
+```
+NAME                       READY   STATUS
+inflate-xxxxx-xxxxx        1/1     Running    # On existing node
+inflate-xxxxx-xxxxx        1/1     Running    # On existing node
+inflate-xxxxx-xxxxx        0/1     Pending    # Waiting for Karpenter
+inflate-xxxxx-xxxxx        0/1     Pending    # Waiting for Karpenter
+... (more Pending)
+```
 ---
 
 ## Configuration Details
