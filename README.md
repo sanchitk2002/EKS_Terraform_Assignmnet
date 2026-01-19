@@ -4,7 +4,7 @@
 
 The following diagram illustrates how **Karpenter dynamically provisions and optimizes compute capacity** in response to Kubernetes workload demands.
 
-![Karpenter Architecture](terraform-eks/diagram/karpenter-architecture.png)
+![Karpenter Architecture](diagram/karpenter-architecture.png)
 
 ### Flow Explanation
 
