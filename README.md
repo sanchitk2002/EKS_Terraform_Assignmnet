@@ -204,7 +204,7 @@ cd ../prod
 terraform init
 terraform apply
 ```
-#### 6: Verify aws-auth ConfigMap
+### 4. Verify aws-auth ConfigMap
 ```bash
 kubectl get configmap aws-auth -n kube-system -o yaml
 ```
@@ -229,7 +229,7 @@ mapRoles: |
 
 #### Deploy Test Workload
 ```bash
-kubectl apply -f test_scaling.yaml
+kubectl apply -f sample_deployment.yaml
 
 # Initial state
 kubectl get pods
@@ -237,7 +237,7 @@ kubectl get pods
 
 #### Trigger Scale-Up
 ```bash
-kubectl scale deployment inflate --replicas=10
+kubectl scale deployment Deployment --replicas=10
 
 # Watch pods
 kubectl get pods -w
@@ -246,10 +246,10 @@ kubectl get pods -w
 **Expected behavior:**
 ```
 NAME                       READY   STATUS
-inflate-xxxxx-xxxxx        1/1     Running    # On existing node
-inflate-xxxxx-xxxxx        1/1     Running    # On existing node
-inflate-xxxxx-xxxxx        0/1     Pending    # Waiting for Karpenter
-inflate-xxxxx-xxxxx        0/1     Pending    # Waiting for Karpenter
+Deployment-xxxxx-xxxxx        1/1     Running    # On existing node
+Deployment-xxxxx-xxxxx        1/1     Running    # On existing node
+Deployment-xxxxx-xxxxx        0/1     Pending    # Waiting for Karpenter
+Deployment-xxxxx-xxxxx        0/1     Pending    # Waiting for Karpenter
 ... (more Pending)
 ```
 ---
