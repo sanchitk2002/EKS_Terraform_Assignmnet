@@ -4,7 +4,7 @@
 
 The following diagram illustrates how **Karpenter dynamically provisions and optimizes compute capacity** in response to Kubernetes workload demands.
 
-![Karpenter Architecture](terraform-eks/diagram/karpenter-architecture.png)
+![Karpenter Architecture](diagram/karpenter-architecture.png)
 
 ### Flow Explanation
 
@@ -172,9 +172,8 @@ Terraform will:
 ### 2. Configure kubectl Access
 
 ```bash
-aws eks update-kubeconfig \
-  --name eks-cluster-dev \
-  --region ap-south-1
+aws eks update-kubeconfig --region <your-region> --name <your-cluster-name>
+kubectl cluster-info
 ```
 
 Verify:
@@ -182,6 +181,10 @@ Verify:
 ```bash
 kubectl get nodes
 kubectl get pods -n karpenter
+
+# Check Karpenter CRDs
+kubectl get nodepool
+kubectl get ec2nodeclass
 ```
 
 ---
@@ -201,14 +204,61 @@ cd ../prod
 terraform init
 terraform apply
 ```
+### 4. Verify aws-auth ConfigMap
+```bash
+kubectl get configmap aws-auth -n kube-system -o yaml
+```
 
+**Should contain TWO roles:**
+```yaml
+mapRoles: |
+  - rolearn: arn:aws:iam::xxx:role/eks-node-group-xxx  # Managed nodes
+    username: system:node:{{EC2PrivateDNSName}}
+    groups: [system:bootstrappers, system:nodes]
+  
+  - rolearn: arn:aws:iam::xxx:role/Karpenter-xxx       # Karpenter nodes
+    username: system:node:{{EC2PrivateDNSName}}
+    groups: [system:bootstrappers, system:nodes]
+```
+
+---
+
+## 🧪 Testing Autoscaling
+
+### Test 1: Scale Up (Trigger Node Provisioning)
+
+#### Deploy Test Workload
+```bash
+kubectl apply -f sample_deployment.yaml
+
+# Initial state
+kubectl get pods
+```
+
+#### Trigger Scale-Up
+```bash
+kubectl scale deployment Deployment --replicas=10
+
+# Watch pods
+kubectl get pods -w
+```
+
+**Expected behavior:**
+```
+NAME                       READY   STATUS
+Deployment-xxxxx-xxxxx        1/1     Running    # On existing node
+Deployment-xxxxx-xxxxx        1/1     Running    # On existing node
+Deployment-xxxxx-xxxxx        0/1     Pending    # Waiting for Karpenter
+Deployment-xxxxx-xxxxx        0/1     Pending    # Waiting for Karpenter
+... (more Pending)
+```
 ---
 
 ## Configuration Details
 
 ### EKS Cluster
 
-* **Kubernetes Version**: 1.29
+* **Kubernetes Version**: 1.34
 * **Endpoint Access**: Private only
 * **Subnets**: Private subnets only
 * **Node Management**: Karpenter (no managed node groups)
