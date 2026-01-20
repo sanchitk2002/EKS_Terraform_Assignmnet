@@ -20,11 +20,11 @@ terraform {
 }
 
 provider "helm" {
-  kubernetes = {
+  kubernetes  {
     host = module.eks.cluster_endpoint
     cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
 
-    exec = {
+    exec {
       api_version = "client.authentication.k8s.io/v1beta1"
       command     = "aws"
       # This requires the awscli to be installed locally where Terraform is executed
@@ -38,15 +38,22 @@ provider "kubectl" {
   host                   = module.eks.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
   load_config_file       = false
+
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
+  }
 }
+
 
 module "eks" {
   source = "../../modules/eks"
 
   cluster_name  = var.cluster_name
-  vpc_id       = data.aws_vpc.selected.id
+  vpc_id       = data.aws_vpc.existing.id
   subnet_ids   = data.aws_subnets.private.ids
-  office_sg_id = data.aws_security_group.office.id
+  office_sg_id = data.aws_security_group.existing.id
   ssh_key_name  = var.ssh_key_name
 }
 
@@ -140,3 +147,4 @@ resource "kubectl_manifest" "karpenter_node_pool" {
   YAML
   depends_on = [ kubectl_manifest.karpenter_node_class ]
 }
+

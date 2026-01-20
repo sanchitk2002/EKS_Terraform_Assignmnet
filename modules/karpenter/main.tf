@@ -23,7 +23,7 @@ resource "helm_release" "karpenter" {
   name       = "karpenter"
   repository = "oci://public.ecr.aws/karpenter"
   chart      = "karpenter"
-  version    = "v0.32.1"
+  version    = "0.32.1"
 
   set {
     name  = "settings.clusterName"
@@ -38,16 +38,6 @@ resource "helm_release" "karpenter" {
   set {
     name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
     value = module.karpenter.irsa_arn
-  }
-
-  set {
-    name  = "settings.defaultInstanceProfile"
-    value = module.karpenter.instance_profile_name
-  }
-
-  set {
-    name  = "settings.interruptionQueueName"
-    value = module.karpenter.queue_name
   }
 }
 

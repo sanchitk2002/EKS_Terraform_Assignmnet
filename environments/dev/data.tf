@@ -20,13 +20,13 @@ data "aws_subnets" "private" {
 }
 
 # Existing Security Group
-data "aws_security_group" "eks_sg" {
+data "aws_security_group" "existing" {
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.existing.id]
   }
   filter {
-    name   = "group-name"
+    name   = "tag:Name"
     values = ["OfficeIPs"]
   }
 }

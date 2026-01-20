@@ -4,7 +4,7 @@ module "eks" {
   version = "21.14.0"
 
   name    = var.cluster_name
-  kubernetes_version = "1.33"
+  kubernetes_version = "1.34"
 
   vpc_id     = var.vpc_id   
   subnet_ids = var.subnet_ids
